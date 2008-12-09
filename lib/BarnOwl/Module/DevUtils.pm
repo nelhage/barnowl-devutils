@@ -20,7 +20,7 @@ BarnOwl::new_command(
     {
         summary     => 'Open the edit window for perl code',
         description => "Opens the edit window and allows the user to \n" .
-                       "enter perl code, and executes the entered code" .
+                       "enter perl code, and executes the entered code.\n" .
                        "Accepts the following options:\n\n" .
                        "-p    Display the result in a popup window\n" .
                        "-a    Display the result as an admin message\n" .
@@ -46,7 +46,8 @@ sub eval_perl {
     my $perl = shift;
     my $result = eval "package main; $perl";
     if($@) {
-        die("$@\n");
+        BarnOwl::error($@);
+        BarnOwl::popless_text("[Error in perl evaluation]\n$@");
     } else {
         if($flags->{dumper}) {
             $result = Dumper($result);
