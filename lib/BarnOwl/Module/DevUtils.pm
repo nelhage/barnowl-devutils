@@ -45,6 +45,9 @@ sub eval_perl {
     my $flags = shift;
     my $perl = shift;
     my $result = eval "package main; $perl";
+    if(!defined($result)) {
+        $result = "undef";
+    }
     if($@) {
         BarnOwl::error($@);
         BarnOwl::popless_text("[Error in perl evaluation]\n$@");
