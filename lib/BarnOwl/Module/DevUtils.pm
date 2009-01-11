@@ -44,14 +44,21 @@ sub cmd_eperl {
 sub eval_perl {
     my $flags = shift;
     my $perl = shift;
-    my $result = eval "package main; $perl";
-    if(!defined($result)) {
-        $result = "undef";
+    my $result;
+    {
+        local $SIG{__WARN__} = sub {
+            my $warning = shift;
+            warn $warning unless $warning =~ /^Subroutine .+ redefined at/;
+        };
+        $result = eval ("package main; " . $perl);
     }
     if($@) {
         BarnOwl::error($@);
         BarnOwl::popless_text("[Error in perl evaluation]\n$@");
     } else {
+        if(!defined($result)) {
+            $result = "undef";
+        }
         if($flags->{dumper}) {
             $result = Dumper($result);
         } elsif($flags->{yaml}) {
