@@ -32,12 +32,15 @@ BarnOwl::new_command(
 
 sub cmd_eperl {
     my $flags = {popless => 0, dumper => 0, yaml => 0, admin => 0};
+    my $p = Getopt::Long::Parser->new;
     local @ARGV = @_;
-    GetOptions(p => \$flags->{popless},
-               a => \$flags->{admin},
-               y => \$flags->{yaml},
-               d => \$flags->{dumper},
-              ) or die("Usage: eperl [-p] [-y] [-d] [-a]\n");
+    
+    $p->configure("bundling");
+    $p->getoptions(p => \$flags->{popless},
+                   a => \$flags->{admin},
+                   y => \$flags->{yaml},
+                   d => \$flags->{dumper},
+                  ) or die("Usage: eperl [-p] [-y] [-d] [-a]\n");
     BarnOwl::start_edit_win("Enter perl to eval: ", sub {eval_perl($flags, shift)});
 }
 
