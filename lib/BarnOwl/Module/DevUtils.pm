@@ -12,6 +12,9 @@ Provides some small utilities to aid perl development in BarnOwl
 =cut
 
 package BarnOwl::Module::DevUtils;
+
+our $VERSION = 0.1;
+
 use Data::Dumper;
 use Getopt::Long;
 
