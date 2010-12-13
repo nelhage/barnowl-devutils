@@ -83,4 +83,41 @@ sub eval_perl {
     }
 }
 
+sub load_snippets {
+    my $snippets_file = "$ENV{'HOME'}/.owl/snippets.pl";
+    my $contents;
+    {
+      local $/=undef;
+      open FILE, $snippets_file or die "Couldn't open file: $!";
+      $contents = <FILE>;
+      close FILE;
+    }
+    eval $contents;
+}
+
+sub cmd_reload_snippets {
+    my $cmd = shift;
+    load_snippets();
+}
+
+BarnOwl::new_command('reload-snippets' => \&cmd_reload_snippets, {
+    summary             => 'Reload ~/.owl/snippets.pl',
+    usage               => 'reload-snippets [-v]',
+    description         => 'Reload ~/.owl/snippets.pl'
+    });
+    
+
+sub startup_load_snippets {
+    my $is_reload = shift;
+
+    load_snippets(0);
+}
+
+eval {
+    $BarnOwl::Hooks::startup->add("BarnOwl::Module::ClassFilters::startup_load_snippets");
+};
+if($@) {
+    $BarnOwl::Hooks::startup->add(\&startup_load_snippets);
+}
+
 1;
