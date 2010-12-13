@@ -114,7 +114,7 @@ sub startup_load_snippets {
 }
 
 eval {
-    $BarnOwl::Hooks::startup->add("BarnOwl::Module::ClassFilters::startup_load_snippets");
+    $BarnOwl::Hooks::startup->add("BarnOwl::Module::DevUtils::startup_load_snippets");
 };
 if($@) {
     $BarnOwl::Hooks::startup->add(\&startup_load_snippets);
