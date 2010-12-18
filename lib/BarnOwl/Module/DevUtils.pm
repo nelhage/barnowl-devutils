@@ -65,17 +65,17 @@ sub eval_perl {
         if(!defined($result)) {
             $result = "undef";
         }
-        if($flags->{dumper}) {
+        if(exists $flags->{dumper} && $flags->{dumper}) {
             $result = Dumper($result);
-        } elsif($flags->{yaml}) {
+        } elsif(exists $flags->{yaml} && $flags->{yaml}) {
             eval {require YAML};
             if(!$@) {
                 $result = YAML::Dump($result);
             }
         }
-        if($flags->{popless}) {
+        if(exists $flags->{popless} && $flags->{popless}) {
             BarnOwl::popless_text($result);
-        } elsif($flags->{admin}) {
+        } elsif(exists $flags->{admin} && $flags->{admin}) {
             BarnOwl::admin_message('Perl eval', $result);
         } else {
             BarnOwl::message($result);
@@ -92,7 +92,7 @@ sub load_snippets {
       $contents = <FILE>;
       close FILE;
     }
-    eval $contents;
+    eval_perl({}, $contents);
 }
 
 sub cmd_reload_snippets {
