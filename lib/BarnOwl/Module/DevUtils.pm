@@ -65,22 +65,59 @@ sub eval_perl {
         if(!defined($result)) {
             $result = "undef";
         }
-        if($flags->{dumper}) {
+        if(exists $flags->{dumper} && $flags->{dumper}) {
             $result = Dumper($result);
-        } elsif($flags->{yaml}) {
+        } elsif(exists $flags->{yaml} && $flags->{yaml}) {
             eval {require YAML};
             if(!$@) {
                 $result = YAML::Dump($result);
             }
         }
-        if($flags->{popless}) {
+        if(exists $flags->{popless} && $flags->{popless}) {
             BarnOwl::popless_text($result);
-        } elsif($flags->{admin}) {
+        } elsif(exists $flags->{admin} && $flags->{admin}) {
             BarnOwl::admin_message('Perl eval', $result);
         } else {
             BarnOwl::message($result);
         }
     }
+}
+
+sub load_snippets {
+    my $snippets_file = "$ENV{'HOME'}/.owl/snippets.pl";
+    my $contents;
+    {
+      local $/=undef;
+      open FILE, $snippets_file or die "Couldn't open file: $!";
+      $contents = <FILE>;
+      close FILE;
+    }
+    eval_perl({}, $contents);
+}
+
+sub cmd_reload_snippets {
+    my $cmd = shift;
+    load_snippets();
+}
+
+BarnOwl::new_command('reload-snippets' => \&cmd_reload_snippets, {
+    summary             => 'Reload ~/.owl/snippets.pl',
+    usage               => 'reload-snippets [-v]',
+    description         => 'Reload ~/.owl/snippets.pl'
+    });
+    
+
+sub startup_load_snippets {
+    my $is_reload = shift;
+
+    load_snippets(0);
+}
+
+eval {
+    $BarnOwl::Hooks::startup->add("BarnOwl::Module::DevUtils::startup_load_snippets");
+};
+if($@) {
+    $BarnOwl::Hooks::startup->add(\&startup_load_snippets);
 }
 
 1;
